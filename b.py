@@ -1,23 +1,59 @@
-responses = {
-    "hi": "Hello there! How can I help you today?",
-    "hello": "Hi! How can I assist you?",
-    "hey": "Hey! What can I do for you?",
-    "how are you": "I'm just a computer program, but I'm here to help you.",
-    "bye": "Goodbye! Have a great day.",
-    "exit": "Goodbye! If you have more questions, feel free to come back."
-}
+def solve_n_queens(n):
+    board = [['.' for _ in range(n)] for _ in range(n)]
+    solutions = []
 
-def chatbot(user_input):
-    user_input = user_input.lower()
-    response = responses.get(user_input, "I'm not sure how to respond to that. Please choose from the predefined inputs: 'hi', 'hello', 'hey', 'how are you', 'bye', 'exit'")
-    return response
+    def is_safe(row, col):
+        # Check same row on the left
+        for c in range(col):
+            if board[row][c] == 'Q':
+                return False
 
-print("Simple Chatbot: Type 'bye' or 'exit' to end.")
+        # Check upper-left diagonal
+        r, c = row, col
+        while r >= 0 and c >= 0:
+            if board[r][c] == 'Q':
+                return False
+            r -= 1
+            c -= 1
 
-while True:
-    user_input = input("You: ")
-    if user_input.lower() == "bye" or user_input.lower() == "exit":
-        print("Simple Chatbot: Goodbye!")
-        break
-    response = chatbot(user_input)
-    print("Simple Chatbot:", response)
+        # Check lower-left diagonal
+        r, c = row, col
+        while r < n and c >= 0:
+            if board[r][c] == 'Q':
+                return False
+            r += 1
+            c -= 1
+
+        return True
+
+    def backtrack(col):
+        if col >= n:
+            current_solution = ["".join(row) for row in board]
+            solutions.append(current_solution)
+            return
+
+        for row in range(n):
+            if is_safe(row, col):
+                board[row][col] = 'Q'
+                backtrack(col + 1)
+                board[row][col] = '.'
+
+    backtrack(0)
+    return solutions
+
+
+def print_solutions(solutions):
+    if not solutions:
+        print("No solutions found.")
+        return
+
+    for i, solution in enumerate(solutions):
+        print(f"Solution {i + 1}:")
+        for row_str in solution:
+            print(row_str)
+        print()
+
+
+n = 4
+found_solutions = solve_n_queens(n)
+print_solutions(found_solutions)
